@@ -4,4 +4,4 @@ Features
 1) User Profiles: Create and manage user profiles with customizable information.
 2) Posts: Share updates and media with followers.
 3) Real-Time Interaction: Engage with posts and users in real-time.
-4) Responsive Design: Fully responsive layout for a seamless experience across devices.
+
