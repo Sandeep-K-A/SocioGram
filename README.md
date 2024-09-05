@@ -24,3 +24,8 @@ Other Tools:
 
 Socket.io: For real-time communication.
 Bootstrap/Tailwind CSS: For styling and responsive design.
+
+Installation
+
+1)Clone the Repository:
+
