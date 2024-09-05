@@ -1,0 +1,1 @@
+Welcome to the Social Media Platform project! This application allows users to create profiles, post updates, and interact with others in real-time. Built with React.js and Node.js, this project demonstrates a full-stack approach to developing modern web applications.
