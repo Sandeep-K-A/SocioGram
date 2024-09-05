@@ -22,16 +22,20 @@ function Sidebar() {
   };
   return (
     <div className="fixed flex flex-col justify-between z-1">
-      <div className="m-6 font-bold text-xl">
+      <div
+        className="m-6 font-bold text-xl cursor-pointer"
+        onClick={() => {
+          navigate("/admin");
+        }}>
         <span className="text-green-600">Socio</span>Gram <span>Admin</span>
       </div>
       <div className="flex flex-col">
-        <button className="flex items-center bg-transparent mx-6 my-2 rounded-md w-full hover:cursor-pointer hover:bg-slate-300 hover:bg-opacity-50">
+        {/* <button className="flex items-center bg-transparent mx-6 my-2 rounded-md w-full hover:cursor-pointer hover:bg-slate-300 hover:bg-opacity-50">
           <MdDashboard className="h-7 w-7" />
           <span className="font-semibold text-17 leading-28 p-2">
             Dashboard
           </span>
-        </button>
+        </button> */}
         <button
           className="flex items-center bg-transparent mx-6 my-2  rounded-md w-full hover:cursor-pointer hover:bg-slate-300 hover:bg-opacity-50"
           onClick={() => {

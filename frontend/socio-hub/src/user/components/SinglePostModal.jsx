@@ -357,7 +357,7 @@ const SinglePostModal = ({ isOpen, onClose, postId, post_id, updateLikes }) => {
           sx={{ width: "80%", height: "90%" }}
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-400 bg-slate-100 shadow-lg ">
           <div className="flex">
-            <div className="w-3/5  h-636">
+            <div className="w-3/5  h-627">
               <img
                 className="object-cover w-full h-full"
                 src={singlePostDetails?.postImage}

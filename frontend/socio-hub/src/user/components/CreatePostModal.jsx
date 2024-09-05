@@ -5,12 +5,14 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import apiInstance from "../../utils/apiInstance";
 import { useNavigate } from "react-router-dom";
-
+import ReactCrop from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 const CreatePostModal = ({ isOpen, onClose }) => {
   const handleClose = () => {
     onClose();
   };
   const [selectedImage, setSelectedImage] = useState(null);
+  const [crop, setCrop] = useState({ aspect: 1 / 1 });
   const [postText, setPostText] = useState("");
 
   const selectedImageRef = useRef(selectedImage);
@@ -23,6 +25,12 @@ const CreatePostModal = ({ isOpen, onClose }) => {
     const file = e.target.files[0];
 
     if (file) {
+      // const reader = new FileReader();
+      // reader.onload = (event) => {
+      //   console.log(event.target.result);
+      //   setSelectedImage(event.target.result);
+      // };
+      // reader.readAsDataURL(file);
       setSelectedImage(file);
     } else {
       setSelectedImage(null);
@@ -31,6 +39,43 @@ const CreatePostModal = ({ isOpen, onClose }) => {
 
   const clearSelectedImage = () => {
     setSelectedImage(null);
+  };
+
+  const handleCropComplete = (crop) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const imageLoader = new Image();
+    imageLoader.src = URL.createObjectURL(selectedImage);
+    imageLoader.onload = () => {
+      const scaleX = imageLoader.width / crop.width;
+      const scaleY = imageLoader.height / crop.height;
+
+      canvas.width = crop.width;
+      canvas.height = crop.height;
+
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.drawImage(
+        imageLoader,
+        crop.x * scaleX,
+        crop.y * scaleY,
+        crop.width * scaleX,
+        crop.height * scaleY,
+        0,
+        0,
+        crop.width,
+        crop.height
+      );
+
+      canvas.toBlob((blob) => {
+        const newFile = new File([blob], `${selectedImage.name}`, {
+          type: "image/jpeg",
+        });
+        setSelectedImage(newFile);
+      }, "image/jpeg");
+    };
   };
 
   const user = useSelector((state) => state.user);
@@ -107,11 +152,21 @@ const CreatePostModal = ({ isOpen, onClose }) => {
                     onClick={clearSelectedImage}>
                     X
                   </button>
-                  <img
+                  {/* <img
                     src={URL.createObjectURL(selectedImage)}
                     alt="Selected"
                     className="h-96 mx-auto"
-                  />
+                  /> */}
+                  <ReactCrop
+                    className="h-96 mx-auto"
+                    crop={crop}
+                    onChange={(newCrop) => setCrop(newCrop)}
+                    onComplete={handleCropComplete}>
+                    <img
+                      src={URL.createObjectURL(selectedImage)}
+                      alt=""
+                    />
+                  </ReactCrop>
                 </div>
               ) : (
                 <div className="mt-8">

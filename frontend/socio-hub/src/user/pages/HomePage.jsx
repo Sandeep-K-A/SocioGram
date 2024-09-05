@@ -14,12 +14,17 @@ function HomePage() {
       navigate("/signin");
     }
   }, [isLoggedIn, navigate]);
+  const sidebarStyle = {
+    width: "20%",
+  };
   return (
     <div className="flex">
-      <div className="w-1/5">
+      <div
+        style={sidebarStyle}
+        className="border-r">
         <Sidebar />
       </div>
-      <div className="w-4/5">
+      <div className="w-full ml-32">
         <Feed />
       </div>
     </div>

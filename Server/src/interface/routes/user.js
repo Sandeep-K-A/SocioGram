@@ -1,6 +1,14 @@
 import express from 'express';
 const router = express.Router()
-import { userSignup, userlogin, userLogout, profileImageUpdate, getUserDetails, updateUserProfile, createNewPost, userFeedPosts, fetchUserProfile, userLikePost, userCommentPost, userSinglePost, userPostComments, editUserPost, userSearch, userGoogleSignup, getUserFollowing, userGoogleSignin, user_Follow_or_unFollow, comment_like_dislike, userEditPostComment, userDeletePostComment, userDeletePost, userPostReport, getUserFollowers, userEmailVerification, forgotPassword, userForgotPassVerification, userPasswordChange } from '../controllers/userController';
+import {
+    userSignup, userlogin, userLogout, profileImageUpdate, getUserDetails, updateUserProfile, createNewPost,
+    userFeedPosts, fetchUserProfile, userLikePost, userCommentPost, userSinglePost, userPostComments, editUserPost,
+    userSearch, userGoogleSignup, getUserFollowing, userGoogleSignin, user_Follow_or_unFollow, comment_like_dislike,
+    userEditPostComment, userDeletePostComment, userDeletePost, userPostReport, getUserFollowers, userEmailVerification,
+    forgotPassword, userForgotPassVerification, userPasswordChange, getAllUserConversations, FetchUserDetailsById,
+    NewConversation, FetchAllMessages, userNewMessage, unSeenMessages, userNotifications
+} from '../controllers/userController';
+
 import upload from '../../adapters/middlewares/upload';
 import { userAuth } from '../../adapters/utils/jwt';
 
@@ -14,6 +22,7 @@ router.post('/forgot-password', forgotPassword)
 router.get('/users/:user_id/forgot-password/:verifyToken', userForgotPassVerification)
 router.patch('/user/password-change/:user_id', userPasswordChange)
 
+router.get('/user-userdetails/:user_id', userAuth, FetchUserDetailsById)
 
 router.get('/profile/:userId', userAuth, fetchUserProfile)
 router.get('/edit-profile/:userId', userAuth, getUserDetails)
@@ -40,5 +49,13 @@ router.post(`/user-post-report/:userId/:postId`, userAuth, userPostReport)
 router.get('/user-following/:userProfileId', userAuth, getUserFollowing)
 router.get('/user-followers/:userProfileId', userAuth, getUserFollowers)
 router.patch('/user-follow-unfollow/:userId/:id', userAuth, user_Follow_or_unFollow)
+
+router.post('/user-newconversation', NewConversation)
+router.get('/user-conversations/:userId', userAuth, getAllUserConversations)
+router.get('/user-messages/:conversationId', FetchAllMessages)
+router.post('/user-new-message', userNewMessage)
+router.get('/user-unseen-messages/:conversationId', unSeenMessages)
+
+router.get('/user-notifications', userAuth, userNotifications)
 
 module.exports = router

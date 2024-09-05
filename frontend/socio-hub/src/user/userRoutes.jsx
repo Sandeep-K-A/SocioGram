@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import EmailVerification from "./components/EmailVerification";
 import ProfilePage from "./pages/ProfilePage";
 import ForgotPassword from "./components/ForgotPassword";
+import MessagesPage from "./pages/MessagesPage";
 
 export const userRoutes = [
   {
@@ -29,5 +30,9 @@ export const userRoutes = [
   {
     path: "/users/:user_id/forgot-password/:verifyToken",
     element: <ForgotPassword />,
+  },
+  {
+    path: "/messenger",
+    element: <MessagesPage />,
   },
 ];

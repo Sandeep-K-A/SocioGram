@@ -188,6 +188,27 @@ export let userLogout = (req, res) => {
     }
 }
 
+export let FetchUserDetailsById = async (req, res) => {
+    try {
+        const user_id = req.params.user_id;
+        const result = await userRepository.findUserBy_id(user_id)
+        if (!result) {
+            res.send({
+                success: false,
+                message: "no user found."
+            })
+        } else {
+            res.send({
+                success: true,
+                message: "user Details fetched successfully",
+                userDetails: result
+            })
+        }
+    } catch (error) {
+
+    }
+}
+
 export let profileImageUpdate = async (req, res) => {
     try {
         console.log('req.file is ..', req.file)
@@ -327,7 +348,8 @@ export let userLikePost = async (req, res) => {
     try {
         let postId = req.params.postId;
         let userName = req.params.userName;
-        let result = await userRepository.likeUserPost(postId, userName)
+        let user_id = req.user_id;
+        let result = await userRepository.likeUserPost(postId, userName, user_id)
         if (!result) {
             res.send({
                 success: false,
@@ -344,29 +366,31 @@ export let userLikePost = async (req, res) => {
     }
 }
 
-export let userCommentPost = async (req, res) => {
-    try {
-        let postId = req.params.postId;
-        let userId = req.params.userId;
-        let comment = req.body.comment;
-        let result = await userRepository.postComment(postId, userId, comment);
-        if (!result) {
-            res.send({
-                success: false,
-                message: "adding a new comment to post failed"
-            })
-        } else {
-            res.send({
-                success: true,
-                message: "adding a new comment to post successfull",
-                newComment: result
-            })
-        }
+export let
+    userCommentPost = async (req, res) => {
+        try {
+            let postId = req.params.postId;
+            let userId = req.params.userId;
+            let comment = req.body.comment;
+            let user_id = req.user_id;
+            let result = await userRepository.postComment(postId, userId, comment, user_id);
+            if (!result) {
+                res.send({
+                    success: false,
+                    message: "adding a new comment to post failed"
+                })
+            } else {
+                res.send({
+                    success: true,
+                    message: "adding a new comment to post successfull",
+                    newComment: result
+                })
+            }
 
-    } catch (error) {
-        throw new Error(error)
+        } catch (error) {
+            throw new Error(error)
+        }
     }
-}
 
 export let userSinglePost = async (req, res) => {
     try {
@@ -485,9 +509,10 @@ export let user_Follow_or_unFollow = async (req, res) => {
     try {
         let userId = req.params.userId;
         let id = req.params.id;
+        let user_id = req.user_id;
         console.log(userId, 'KKKKKKKK')
         console.log(id, '(((((((((((((((')
-        let result = await userRepository.userfollowing(userId, id)
+        let result = await userRepository.userfollowing(userId, id, user_id)
         console.log(result)
         if (!result) {
             res.send({
@@ -649,6 +674,126 @@ export let forgotPassword = async (req, res) => {
             res.send({
                 success: true,
                 message: result.message
+            })
+        }
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
+export let getAllUserConversations = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const conversations = await userRepository.getUserConversations(userId)
+        console.log(conversations, '{{{{{{')
+        if (!conversations) {
+            res.send({
+                success: false,
+                message: "No conversations for the user yet..."
+            })
+        } else {
+            res.send({
+                success: true,
+                message: "Conversation of the user fetched successfully",
+                conversations
+            })
+        }
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
+export let NewConversation = async (req, res) => {
+    try {
+        const { senderId, recieverId } = req.body;
+        const result = await userRepository.createNewConversation(senderId, recieverId)
+        res.send({
+            success: true,
+            message: "New conversation created",
+            conversation: result
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
+export let FetchAllMessages = async (req, res) => {
+    try {
+        const conversationId = req.params.conversationId;
+        const result = await userRepository.getAllMessages(conversationId)
+        if (!result) {
+            res.send({
+                success: false,
+                message: "No messages in the conversation yet."
+            })
+        } else {
+            res.send({
+                success: true,
+                message: "Messages in the particular conversation fetched successfully",
+                messages: result
+            })
+        }
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+export let userNewMessage = async (req, res) => {
+    console.log('***********88')
+    try {
+        const result = await userRepository.createNewMessage(req.body)
+        if (!result) {
+            res.send({
+                success: false,
+                message: "no idea"
+            })
+        } else {
+            res.send({
+                success: true,
+                message: "new message successfully send",
+                newMessage: result
+            })
+        }
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+export let unSeenMessages = async (req, res) => {
+    try {
+        const conversationId = req.params.conversationId;
+        const result = await userRepository.getMessagesCount(conversationId)
+        console.log(result, conversationId, '&&&&&&&&&&&&&&&&&&&^^^^^^^^^^^^6')
+        if (!result) {
+            res.send({
+                success: false,
+                message: "Messages count unavailable"
+            })
+        } else {
+            res.send({
+                success: true,
+                message: "Messages count fetched successfully",
+                unSeenCount: result
+            })
+        }
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+export let userNotifications = async (req, res) => {
+    try {
+        const user_id = req.user_id;
+        console.log(user_id)
+        const result = await userRepository.fetchUserNotifications(user_id)
+        console.log(result)
+        if (!result) {
+            res.send({
+                success: false,
+                message: "No new Notifications"
+            })
+        } else {
+            res.send({
+                success: true,
+                message: "Notifications successfully fetched.",
+                notifications: result
             })
         }
     } catch (error) {

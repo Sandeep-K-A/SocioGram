@@ -59,7 +59,6 @@ export const authentication = async (req, res, next) => {
 };
 export const userAuth = async (req, res, next) => {
     try {
-        console.log('userAuth Accessed.....')
         const authHeader = req.headers['authorization']
         if (authHeader) {
             const token = authHeader.split(' ')[1];
@@ -79,6 +78,8 @@ export const userAuth = async (req, res, next) => {
                             message: 'user not found',
                         });
                     }
+                    const user_id = user._id;
+                    req.user_id = user_id;
                     next()
                 } catch (error) {
                     return res.status(500).json({

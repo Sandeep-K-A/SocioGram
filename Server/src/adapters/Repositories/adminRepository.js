@@ -138,6 +138,24 @@ const adminRepository = {
         } catch (error) {
             throw new Error(error)
         }
+    },
+    getUserCountMonth: async () => {
+        try {
+            const users = await usersModel.aggregate([
+                {
+                    $group: {
+                        _id: { $month: '$createdAt' },
+                        count: { $sum: 1 }
+                    }
+                },
+                {
+                    $sort: { '_id': 1 }
+                }
+            ]).exec()
+            return users
+        } catch (error) {
+            throw new Error(error)
+        }
     }
 }
 

@@ -20,6 +20,7 @@ import { useState, useCallback } from "react";
 import EditProfileModal from "./EditProfileModal";
 import PersonalSettingsModal from "./PersonalSettingsModal";
 import CreatePostModal from "./CreatePostModal";
+import Notification from "./Notification";
 import { useSelector } from "react-redux";
 import { Modal, Box, Avatar } from "@mui/material";
 import debounce from "lodash.debounce";
@@ -75,6 +76,13 @@ function Sidebar() {
     setCreatePostModalOpen(false);
   };
 
+  const [notificationModal, setNotificationModal] = useState(false);
+  const handleNotificationOpen = () => {
+    setNotificationModal(true);
+  };
+  const handleNotificationClose = () => {
+    setNotificationModal(false);
+  };
   const [searchModal, setSearchModal] = useState(false);
   const handleSearchOpen = () => {
     setSearchModal(true);
@@ -144,7 +152,11 @@ function Sidebar() {
   // }, [searchTerm]);
   return (
     <div className="fixed flex flex-col justify-between z-1">
-      <div className="m-6 font-bold text-2xl">
+      <div
+        className="m-6 font-bold text-3xl cursor-pointer"
+        onClick={() => {
+          navigate("/");
+        }}>
         <span className="text-green-600">Socio</span>Gram
       </div>
       <div className="flex flex-col">
@@ -168,9 +180,15 @@ function Sidebar() {
         </button>
         <button className="flex items-center bg-transparent mx-6 my-2  rounded-md w-full hover:cursor-pointer hover:bg-slate-300 hover:bg-opacity-50">
           <FiSend className="h-7 w-7" />
-          <span className="font-base text-17 leading-28 p-2">Messages</span>
+          <span
+            className="font-base text-17 leading-28 p-2"
+            onClick={() => navigate("/messenger")}>
+            Messages
+          </span>
         </button>
-        <button className="flex items-center bg-transparent mx-6 my-2  rounded-md w-full hover:cursor-pointer hover:bg-slate-300 hover:bg-opacity-50">
+        <button
+          onClick={handleNotificationOpen}
+          className="flex items-center bg-transparent mx-6 my-2  rounded-md w-full hover:cursor-pointer hover:bg-slate-300 hover:bg-opacity-50">
           <FiHeart className="h-7 w-7" />
           <span className="font-base text-17 leading-28 p-2">
             Notifications
@@ -243,6 +261,12 @@ function Sidebar() {
         <CreatePostModal
           isOpen={createPostModalOpen}
           onClose={handlePostModalClose}
+        />
+      )}
+      {notificationModal && (
+        <Notification
+          isOpen={notificationModal}
+          onClose={handleNotificationClose}
         />
       )}
       {searchModal && (

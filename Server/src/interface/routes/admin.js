@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router()
-import { adminSignup, adminLogout, adminLogin, adminFetchUsers, userAccess, deleteUser, adminFetchReports, adminResolveReport, adminDeleteReport } from '../controllers/adminController';
+import { adminSignup, adminLogout, adminLogin, adminFetchUsers, userAccess, deleteUser, adminFetchReports, adminResolveReport, adminDeleteReport, adminUsersCountByMonth } from '../controllers/adminController';
 import { authentication } from '../../adapters/utils/jwt';
 
 
@@ -9,6 +9,7 @@ router.post('/signup', adminSignup)
 router.post('/signin', adminLogin)
 router.post('/logout', adminLogout)
 
+router.get('/user-count-month', adminUsersCountByMonth)
 
 router.get('/allusers', authentication, adminFetchUsers)
 router.get('/change-user-access/:userId', authentication, userAccess)

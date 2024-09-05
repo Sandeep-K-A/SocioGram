@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { useEffect, useState, useRef } from "react";
 import SinglePostModal from "./SinglePostModal";
 import { Box, Modal } from "@mui/material";
+import { format } from "timeago.js";
 
 function Post({ postId }) {
   const [postDetails, setPostDetails] = useState({});
@@ -136,7 +137,9 @@ function Post({ postId }) {
             R
           </Avatar>
           {postDetails?.userId?.userName} •{" "}
-          <span className="text-gray-500 text-base pt-2px">12h</span>
+          <span className="text-gray-500 text-base pt-2px">
+            {format(postDetails?.createdAt)}
+          </span>
         </div>
         <MdMoreHoriz
           className="cursor-pointer"

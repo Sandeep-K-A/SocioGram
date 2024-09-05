@@ -22,5 +22,4 @@ export let streamUpload = (fileBuffer) => {
         stream.end()
     })
 
-
 }

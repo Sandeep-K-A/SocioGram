@@ -61,6 +61,7 @@ export let adminLogout = (req, res) => {
 export let adminFetchUsers = async (req, res) => {
     try {
         let users = await adminRepository.getAllUsers()
+        console.log(users)
         if (!users) {
             res.send(
                 {
@@ -168,6 +169,26 @@ export let adminDeleteReport = async (req, res) => {
                 success: true,
                 message: 'Report deleted successfully',
                 deletedReport: result
+            })
+        }
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+export let adminUsersCountByMonth = async (req, res) => {
+    try {
+        const result = await adminRepository.getUserCountMonth()
+        console.log(result)
+        if (!result) {
+            res.send({
+                success: false,
+                message: 'Error Fetching monthly users count.'
+            })
+        } else {
+            res.send({
+                success: true,
+                message: "Monthly users count successfully fetched.",
+                monthlyUsersCount: result
             })
         }
     } catch (error) {

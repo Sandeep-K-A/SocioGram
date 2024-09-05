@@ -1,5 +1,4 @@
 import { Avatar, Modal, Box } from "@mui/material";
-import { MdOutlineSettings } from "react-icons/md";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark, faGripVertical } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
@@ -13,6 +12,7 @@ import { FaComment } from "react-icons/fa";
 import { updateFollowing } from "../../utils/store/userSlice";
 import { useDispatch } from "react-redux";
 import ListsModal from "./ListsModal";
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
   const [open, setOpen] = useState(false);
@@ -28,6 +28,7 @@ function Profile() {
   const [userFollowers, setUserFollowers] = useState([]);
   const [followersList, setFollowersList] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleOpen = () => {
     setOpen(true);
@@ -150,12 +151,32 @@ function Profile() {
       console.error(`API Error ${error}`);
     }
   };
+  const CreateNewConversation = async () => {
+    const requestBody = {
+      senderId: loggedUserId,
+      recieverId: userProfileData?._id,
+    };
+    const response = await apiInstance.post(
+      `/user-newconversation`,
+      requestBody,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const { success, conversation } = response.data;
+    if (success) {
+      navigate(`/messenger?conversationId=${conversation._id}`);
+    }
+  };
   useEffect(() => {
     fetchUserProfile();
     fetchUserFollowing();
     fetchUserFollowers();
   }, [userId]);
-  console.log(postDetails);
+  console.log(userId, "IIIIIIIIIIIIIiiii");
   return (
     <div className="mx-5 p-10 xl:mx-auto">
       <div className="grid grid-cols-4 gap-4">
@@ -193,7 +214,15 @@ function Profile() {
               follow
             </button>
           )}
-          <MdOutlineSettings className="inline !w-6 !h-6 cursor-pointer" />
+          {profileId != userId ? (
+            <button
+              className="text-sm text-white bg-green-500 font-medium px-2 py-1 rounded-full ml-2"
+              onClick={CreateNewConversation}>
+              Message
+            </button>
+          ) : (
+            ""
+          )}
           <div className="flex mt-4">
             <div className="text-lg">
               <span className="font-bold pr-2">{userPosts?.length}</span>

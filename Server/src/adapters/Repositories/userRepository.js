@@ -3,6 +3,9 @@ import postsModel from "../Models/userPosts";
 import commentsModel from "../Models/commentModel";
 import reportsModel from "../Models/reportsModel";
 import tokenModel from "../Models/tokenModel";
+import conversationModel from "../Models/conversationModel";
+import messageModel from "../Models/messageModel";
+import notificationModel from "../Models/notificationModel";
 
 const userRepository = {
 
@@ -21,6 +24,17 @@ const userRepository = {
     findUserById: async (userId) => {
         try {
             let user = await usersModel.findOne({ userId })
+            if (!user) {
+                return null;
+            }
+            return user;
+        } catch (error) {
+            throw new Error(error)
+        }
+    },
+    findUserBy_id: async (user_id) => {
+        try {
+            const user = await usersModel.findOne({ _id: user_id });
             if (!user) {
                 return null;
             }
@@ -115,7 +129,8 @@ const userRepository = {
                 fullName,
                 userName,
                 email,
-                profilePic
+                profilePic,
+                verified: true,
             })
             let savedUser = await newUser.save()
             return savedUser
@@ -223,7 +238,7 @@ const userRepository = {
                             {
                                 $or: [
                                     { userId: user._id },
-                                    { userId: { $in: user.followers } }
+                                    { userId: { $in: user.following } }
                                 ]
                             },
                             { isActive: true }
@@ -240,9 +255,10 @@ const userRepository = {
                         as: 'user'
                     }
                 },
-                { $unwind: '$user' }
+                { $unwind: '$user' },
+                { $sort: { createdAt: -1 } }
+
             ])
-            console.log(posts, 'all posts............')
             if (!posts) {
                 return null;
             }
@@ -262,7 +278,7 @@ const userRepository = {
             throw new Error(error)
         }
     },
-    likeUserPost: async (postId, userName) => {
+    likeUserPost: async (postId, userName, user_id) => {
         try {
             let post = await postsModel.findOne({ postId })
             if (!post) {
@@ -275,13 +291,20 @@ const userRepository = {
             } else {
                 post.likes.push(userName)
                 await post.save()
+                let notification = new notificationModel({
+                    reciever: post.userId,
+                    sender: user_id,
+                    type: 'like',
+                    content: post.postImage,
+                })
+                await notification.save();
             }
             return post.likes;
         } catch (error) {
             throw new Error(error)
         }
     },
-    postComment: async (postId, userId, comment) => {
+    postComment: async (postId, userId, comment, user_id) => {
         try {
             let newComment = await new commentsModel({
                 userId,
@@ -294,7 +317,17 @@ const userRepository = {
             let count = await commentsModel.countDocuments({ postId: postId, isActive: true })
             let post = await postsModel.findOne({ _id: postId })
             post.commentsCount = count;
+            console.log(post, "((((((((((")
             post.save()
+            let notification = new notificationModel({
+                reciever: post.userId,
+                sender: user_id,
+                type: 'comment',
+                content: post.postImage,
+                contentComment: comment
+
+            })
+            await notification.save()
             return fetchNewComment;
         } catch (error) {
             throw new Error(error)
@@ -370,7 +403,7 @@ const userRepository = {
             throw new Error(error)
         }
     },
-    userfollowing: async (userId, id) => {
+    userfollowing: async (userId, id, user_id) => {
         try {
             const user = await usersModel.findOne({ userId })
             const followedUser = await usersModel.findById(id)
@@ -390,6 +423,12 @@ const userRepository = {
                 await user.save()
                 followedUser.followers.push(user._id)
                 await followedUser.save()
+                const notification = new notificationModel({
+                    reciever: id,
+                    sender: user_id,
+                    type: 'follow'
+                })
+                await notification.save()
                 return { followedUser, user };
             }
         } catch (error) {
@@ -487,6 +526,91 @@ const userRepository = {
                 return null;
             }
             return user.followers;
+        } catch (error) {
+            throw new Error(error)
+        }
+    },
+    createNewConversation: async (senderId, recieverId) => {
+        try {
+            const conversationExist = await conversationModel.findOne({
+                $and: [{ members: { $all: [senderId, recieverId] } }]
+            })
+            if (!conversationExist) {
+                const newConversation = new conversationModel({
+                    members: [senderId, recieverId]
+                })
+                await newConversation.save()
+                return newConversation;
+            }
+            return conversationExist
+        } catch (error) {
+            throw new Error(error)
+        }
+    },
+    getUserConversations: async (userId) => {
+        try {
+            const conversations = await conversationModel.find({
+                members: { $in: [userId] }
+            })
+            if (conversations.length == 0) {
+                console.log(conversations, 'userRepo')
+                return null;
+            }
+            return conversations;
+        } catch (error) {
+            throw new Error(error)
+        }
+    },
+    createNewMessage: async (body) => {
+
+        try {
+            const newMessage = new messageModel(body)
+            await newMessage.save()
+            return newMessage;
+        } catch (error) {
+            throw new Error(error)
+        }
+    },
+    getAllMessages: async (conversationId) => {
+
+        try {
+            const messages = await messageModel.find({
+                conversationId
+            })
+            if (!messages) {
+                return null;
+            }
+
+            await messageModel.updateMany({ conversationId: conversationId, seen: false }, { $set: { seen: true } })
+            return messages;
+        } catch (error) {
+            throw new Error(error)
+        }
+    },
+    getMessagesCount: async (conversationId) => {
+        try {
+            const count = await messageModel.countDocuments({ conversationId: conversationId, seen: false })
+            if (!count) {
+                return null;
+            }
+            return count;
+        } catch (error) {
+            throw new Error(error)
+        }
+    },
+    fetchUserNotifications: async (user_id) => {
+        try {
+            const notifications = await notificationModel.find({ reciever: user_id }).populate({
+                path: 'reciever',
+                select: 'userName profilePic'
+            }).populate({
+                path: 'sender',
+                select: 'userName profilePic'
+            }).sort({ createdAt: -1 })
+            if (!notifications) {
+                return null;
+            }
+            return notifications;
         } catch (error) {
             throw new Error(error)
         }

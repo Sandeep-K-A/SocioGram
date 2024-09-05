@@ -23,7 +23,8 @@ export default {
         '450px': '450px',
         '1200px': '1200px',
         '410px': '410px',
-        '360px': '360px'
+        '360px': '360px',
+        '840px': '840px'
       },
       zIndex: {
         '1': '1'
@@ -31,7 +32,10 @@ export default {
       height: {
         '685px': '685px',
         '650px': '650px',
-        '636': '636px'
+        '627': '627px',
+        '636': '636px',
+        '640': '640px',
+        '706': '706px'
       },
       borderWidth: {
         '1px': '1px'
